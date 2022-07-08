@@ -1,0 +1,13 @@
+1. Set Up Working Environment
+git clone -b starter-pack https.//.....
+
+2. npm install
+
+3. Start Server with
+npm run start
+
+4. Try Truffle Connections. Migration codes is in /migrations (1_initial_migration.js, 2_deploy_contracts.js)
+truffle migrate --reset
+
+5. Make Test Programs
+../test/test.js
