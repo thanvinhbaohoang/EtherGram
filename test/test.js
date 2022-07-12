@@ -1,3 +1,5 @@
+const { assert } = require('chai')
+
 const Ethergram = artifacts.require('./Ethergram.sol')
 
 require('chai')
@@ -11,7 +13,8 @@ contract('Ethergram', ([deployer, author, tipper]) => {
     ethergram = await Ethergram.deployed()
   })
 
-  describe('Deployment', async () => {
+  // =========== DEPLOYMENT ============
+  describe('DEPLOYMENT', async () => {
     it('Deploys Successfully', async () => {
       const address = await Ethergram.address
       assert.notEqual(address, 0x0)
@@ -25,4 +28,23 @@ contract('Ethergram', ([deployer, author, tipper]) => {
       assert.equal(name, 'Ethergram')
     })
   })
+
+
+    // ============== IMAGES =============
+    describe('IMAGES', async () => {
+      let result;
+      it('Create Images', async () => {
+        result = await ethergram.uploadImage()
+        let image = await ethergram.images(1);
+        console.log(image)
+      })
+    })
+    
+
+
+
+
+     // ============ TIPPING =============
+     describe('IMAGES', async () => {
+    })
 })
