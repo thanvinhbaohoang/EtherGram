@@ -68,7 +68,7 @@ contract('Ethergram', ([deployer, author, tipper]) => {
       })
     })
     
-
+ 
      // ============ TIPPING =============
      describe('IMAGES', async () => {
     })

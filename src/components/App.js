@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import Identicon from 'identicon.js';
 import './App.css';
-import Decentragram from '../abis/Decentragram.json'
+import Ethergram from '../abis/Ethergram.json'
 import Navbar from './Navbar'
 import Main from './Main'
 
@@ -35,28 +35,20 @@ class App extends Component {
     console.log(accounts)
     this.setState({ account: accounts[0] }) // Default to First Wallet Address in Metamask
 
-    // Network ID
+    //Network ID
     const networkId = await web3.eth.net.getId()
-    const networkData = Decentragram.networks[networkId]
-    if(networkData) {
-      const decentragram = new web3.eth.Contract(Decentragram.abi, networkData.address)
-      this.setState({ decentragram })
-      const imagesCount = await decentragram.methods.imageCount().call()
-      this.setState({ imagesCount })
-      // Load images
-      for (var i = 1; i <= imagesCount; i++) {
-        const image = await decentragram.methods.images(i).call()
-        this.setState({
-          images: [...this.state.images, image]
-        })
-      }
-      // Sort images. Show highest tipped images first
-      this.setState({
-        images: this.state.images.sort((a,b) => b.tipAmount - a.tipAmount )
-      })
-      this.setState({ loading: false})
+    const networkData = Ethergram.networks[networkId]
+    if (networkData) {
+      const ethergram = web3.eth.Contract(Ethergram.abi, networkData.address); //Import Ethergram.json and access its abi from folder `abis`
+      this.setState({ethergram})
+      // const imagesCount = await ethergram.methods.imagesCount().call()
+      // this.setState({imagesCount})
+
+      // Change Loading Status
+      this.setState({loading: false})
+      
     } else {
-      window.alert('Decentragram contract not deployed to detected network.')
+      window.alert('Ethergram Contract Not Deployed On Network')
     }
   }
   
@@ -64,6 +56,9 @@ class App extends Component {
     super(props)
     this.state = {
       account: '',
+      ethergram: null,
+      images: [],
+      loading: true
     }
   }
 
@@ -71,8 +66,10 @@ class App extends Component {
     return (
       <div>
         <Navbar account={this.state.account} />
-        { this.state.loading
-          ? <div id="loader" className="text-center mt-5"><p>Loading...</p></div>
+        { this.state.loading? //
+          <div id="loader" className="text-center mt-5">
+            <p>Loading...</p>
+          </div>
           : <Main
             // Code...
             />
