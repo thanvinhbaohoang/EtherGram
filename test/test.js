@@ -42,6 +42,7 @@ contract('Ethergram', ([deployer, author, tipper]) => {
         result = await ethergram.uploadImage(test_hash, test_description,  {from: author});
         test_imageCount = await ethergram.imageCount()
       })
+
       it('Create Images', async () => {
         // SUCCESS
         const event = result.logs[0].args // Get Info if Image Struct after calling uploadImage()
@@ -53,13 +54,22 @@ contract('Ethergram', ([deployer, author, tipper]) => {
 
         // FAILURE: Image must have hash
         await ethergram.uploadImage('', test_description, {from:author}).should.be.rejected;
-        
+        // FAILURE: Image must have description
+        await ethergram.uploadImage('', '', {from:author}).should.be.rejected;
+      })
+
+      it('Lists Images', async () => {
+        const image = await ethergram.images(test_imageCount);
+        assert.equal(image.id.toNumber(), test_imageCount.toNumber(), 'id is correct')
+        assert.equal(image.hash_string, test_hash, 'Hash is correct')
+        assert.equal(image.description,test_description, 'Description is correct')
+        assert.equal(image.tipAmount,test_tipAmount, 'Tip Amount is correct')
+        assert.equal(image.author, author, 'Author is correct')
       })
     })
     
 
-
      // ============ TIPPING =============
-    //  describe('IMAGES', async () => {
-    // })
+     describe('IMAGES', async () => {
+    })
 })

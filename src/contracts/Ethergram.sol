@@ -15,13 +15,14 @@ contract Ethergram {
         string hash_string;
         string description;
         uint tipAmount;
-        address author;
+        address payable author;
     }
 
 
-    // EVENT happen after uploadImage is called
-    event ImageCreated( uint id, string hash_string, string description, uint tipAmount,address author);
-
+    // EVENT happen at Function calls
+    event ImageCreated( uint id, string hash_string, string description, uint tipAmount,address payable author);
+    event ImageTipped( uint id, string hash_string, string description, uint tipAmount,address payable author);
+   
     //====== Create Images =======
     function uploadImage(string memory _imgHash, string memory _description) public {
         //Require imageHash to exist
@@ -43,5 +44,22 @@ contract Ethergram {
 
 
     //======= Tip Images =========
-    
+    function tipImageOwner(uint _id) public payable {
+        // Check if image's ID is legal
+        require(_id > 0 && _id <= imageCount);
+
+        // 'memory' is local function call, do not get stored on blockchain 
+        Image memory _image = images[_id];
+        //Fetch Author
+        address payable _author = _image.author;
+        // Pay the author by sending them Ether
+        address(_author).transfer(msg.value);
+        // Increment tip amoung
+        _image.tipAmount = _image.tipAmount+ msg.value;
+        //Update Image
+        images[_id] = _image;
+
+        // Emit event
+        emit ImageTipped(_id, _image.hash_string, _image.description, _image.tipAmount, _author);
+    }
 }

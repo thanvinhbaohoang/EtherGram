@@ -13,7 +13,7 @@ class Main extends Component {
               <h1 className="d-4">Welcome To EtherGram</h1>
                 
                 {/* Code ... */}
-
+                
               <p>&nbsp;</p>
                 
                 {/* Code ... */}
