@@ -9,7 +9,6 @@ import Main from './Main'
 
 class App extends Component {
   async componentDidMount(){
-    // await this.loadWeb3();
     await this.loadWeb3();
     await this.loadBlockchainData()
   };
@@ -28,30 +27,65 @@ class App extends Component {
     }
   }
 
+  // async loadBlockchainData() {
+  //   const web3 = window.web3
+  //   // Load account
+  //   const accounts = await web3.eth.getAccounts()
+  //   console.log(accounts)
+  //   this.setState({ account: accounts[0] }) // Default to First Wallet Address in Metamask
+
+  //   //Network ID
+  //   const networkId = await web3.eth.net.getId()
+  //   const networkData = Ethergram.networks[networkId]
+  //   if (networkData) {
+  //     const ethergram = web3.eth.Contract(Ethergram.abi, networkData.address); //Import Ethergram.json and access its abi from folder `abis`
+  //     this.setState({ethergram})
+  //     // const imagesCount = await ethergram.methods.imagesCount().call()
+  //     // this.setState({imagesCount})
+      
+  //     // Change Loading Status
+  //     this.setState({loading: false})
+      
+  //   } else {
+  //     window.alert('Ethergram Contract Not Deployed On Network')
+  //   }
+  // }
+  
+
   async loadBlockchainData() {
     const web3 = window.web3
     // Load account
     const accounts = await web3.eth.getAccounts()
-    console.log(accounts)
-    this.setState({ account: accounts[0] }) // Default to First Wallet Address in Metamask
-
-    //Network ID
+    this.setState({ account: accounts[0] })
+    // Network ID
     const networkId = await web3.eth.net.getId()
     const networkData = Ethergram.networks[networkId]
-    if (networkData) {
-      const ethergram = web3.eth.Contract(Ethergram.abi, networkData.address); //Import Ethergram.json and access its abi from folder `abis`
-      this.setState({ethergram})
-      // const imagesCount = await ethergram.methods.imagesCount().call()
-      // this.setState({imagesCount})
 
-      // Change Loading Status
-      this.setState({loading: false})
-      
+    // Check for CONTRACT DEPLOYMENT
+    if(networkData) {
+      const etheregram = new web3.eth.Contract(Ethergram.abi, networkData.address)
+      this.setState({ etheregram })
+      const imagesCount = await etheregram.methods.imageCount().call()
+      this.setState({ imagesCount })
+
+      // Load images
+      for (var i = 1; i <= imagesCount; i++) {
+        const image = await etheregram.methods.images(i).call()
+        this.setState({
+          images: [...this.state.images, image]
+        })
+      }
+      // Sort images. Show highest tipped images first
+      this.setState({
+        images: this.state.images.sort((a,b) => b.tipAmount - a.tipAmount )
+      })
+      this.setState({ loading: false})
     } else {
-      window.alert('Ethergram Contract Not Deployed On Network')
+      window.alert('Ethergram contract not deployed to detected network.')
     }
   }
-  
+
+
   constructor(props) {
     super(props)
     this.state = {

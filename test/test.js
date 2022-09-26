@@ -32,44 +32,76 @@ contract('Ethergram', ([deployer, author, tipper]) => {
 
     // ============== IMAGES =============
     describe('IMAGES', async () => {
-      let result, test_imageCount;
-      const test_hash = 'abc123'
-      const test_description = 'Image description'
-      const test_tipAmount = '0'
+      let result, imageCount;
+      const hash = 'abc123'
+      const description = 'Image description'
+      const tipAmount = '0'
 
       before(async () => {
         // ACTIONS
-        result = await ethergram.uploadImage(test_hash, test_description,  {from: author});
-        test_imageCount = await ethergram.imageCount()
+        result = await ethergram.uploadImage(hash, description,  {from: author});
+        imageCount = await ethergram.imageCount()
       })
 
       it('Create Images', async () => {
         // SUCCESS
         const event = result.logs[0].args // Get Info if Image Struct after calling uploadImage()
-        assert.equal(event.id.toNumber(), test_imageCount.toNumber(), 'id is correct')
-        assert.equal(event.hash_string, test_hash, 'Hash is correct')
-        assert.equal(event.description,test_description, 'Description is correct')
-        assert.equal(event.tipAmount,test_tipAmount, 'Tip Amount is correct')
+        assert.equal(event.id.toNumber(), imageCount.toNumber(), 'id is correct')
+        assert.equal(event.hash_string, hash, 'Hash is correct')
+        assert.equal(event.description,description, 'Description is correct')
+        assert.equal(event.tipAmount,tipAmount, 'Tip Amount is correct')
         assert.equal(event.author, author, 'Author is correct')
-
+        // LOG FOR CONTRACT INFO IN `truffle test`
+        console.log(result)
         // FAILURE: Image must have hash
-        await ethergram.uploadImage('', test_description, {from:author}).should.be.rejected;
+        await ethergram.uploadImage('', description, {from:author}).should.be.rejected;
         // FAILURE: Image must have description
         await ethergram.uploadImage('', '', {from:author}).should.be.rejected;
       })
 
       it('Lists Images', async () => {
-        const image = await ethergram.images(test_imageCount);
-        assert.equal(image.id.toNumber(), test_imageCount.toNumber(), 'id is correct')
-        assert.equal(image.hash_string, test_hash, 'Hash is correct')
-        assert.equal(image.description,test_description, 'Description is correct')
-        assert.equal(image.tipAmount,test_tipAmount, 'Tip Amount is correct')
+        const image = await ethergram.images(imageCount);
+        assert.equal(image.id.toNumber(), imageCount.toNumber(), 'id is correct')
+        assert.equal(image.hash_string, hash, 'Hash is correct')
+        assert.equal(image.description,description, 'Description is correct')
+        assert.equal(image.tipAmount,tipAmount, 'Tip Amount is correct')
         assert.equal(image.author, author, 'Author is correct')
+      })
+
+      it('allows users to tip images', async () => {
+        // Track the author balance before purchase
+        let oldAuthorBalance
+        oldAuthorBalance = await web3.eth.getBalance(author)
+        oldAuthorBalance = new web3.utils.BN(oldAuthorBalance)
+  
+        result = await ethergram.tipImageOwner(imageCount, { from: tipper, value: web3.utils.toWei('1', 'Ether') })
+  
+        // SUCCESS
+        const event = result.logs[0].args
+        assert.equal(event.id.toNumber(), imageCount.toNumber(), 'id is correct')
+        assert.equal(event.hash_string, hash, 'Hash is correct')
+        assert.equal(event.description, 'Image description', 'description is correct')
+        assert.equal(event.tipAmount, '1000000000000000000', 'tip amount is correct')
+        assert.equal(event.author, author, 'author is correct')
+  
+        // Check that author received funds
+        let newAuthorBalance
+        newAuthorBalance = await web3.eth.getBalance(author)
+        newAuthorBalance = new web3.utils.BN(newAuthorBalance)
+  
+        let tipImageOwner
+        tipImageOwner = web3.utils.toWei('1', 'Ether')
+        tipImageOwner = new web3.utils.BN(tipImageOwner)
+  
+        const expectedBalance = oldAuthorBalance.add(tipImageOwner)
+  
+        assert.equal(newAuthorBalance.toString(), expectedBalance.toString())
+  
+        // FAILURE: Tries to tip a image that does not exist
+        await ethergram.tipImageOwner(99, { from: tipper, value: web3.utils.toWei('1', 'Ether')}).should.be.rejected;
+
       })
     })
     
- 
-     // ============ TIPPING =============
-     describe('IMAGES', async () => {
-    })
+
 })
