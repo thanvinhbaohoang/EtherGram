@@ -63,8 +63,11 @@ class App extends Component {
 
     // Check for CONTRACT DEPLOYMENT
     if(networkData) {
+      // Get SMART CONTRACT
       const etheregram = new web3.eth.Contract(Ethergram.abi, networkData.address)
       this.setState({ etheregram })
+
+      // Image Displays
       const imagesCount = await etheregram.methods.imageCount().call()
       this.setState({ imagesCount })
 

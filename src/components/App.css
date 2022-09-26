@@ -1,1 +1,22 @@
 /* Styles go here */
+body{
+    color: aliceblue;
+    background-color: cadetblue;
+    font-family: 'Ubuntu';
+}
+.wallet-name{
+    color: white;
+    margin: 20px;
+    font-size: 18px;
+}
+
+.navbar {
+    background-color: rgb(190, 77, 201);
+    color: white;
+    justify-content: space-between;
+}
+
+.nav-logo {
+    color: white;
+    font-size: 30px;
+}
