@@ -23,3 +23,14 @@ $ `ganache`
 `truffle migrate`: To deploy contract to Blockchain
 
 We are using web3 library to detect metamask and connect wallet
+- Located in App.js `function loadWeb3()`
+
+
+==========================================
+# Learned
+Using IPFS for decentralized data storage
+Use web3 library
+Using Ganache for test blockchain RPC
+Learn to write simple Smart Contract using Solidity
+Use Truffle to test smart contract 
+use Truffle to Deploy (Migrate) contract
